@@ -7,8 +7,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.util.SelfSignedCertificate;
 
 /**
  * An HTTP server that sends back the content of the received HTTP request in a
@@ -16,19 +14,9 @@ import io.netty.handler.ssl.util.SelfSignedCertificate;
  */
 public final class SasukeServer {
 
-	static final boolean SSL = System.getProperty("ssl") != null;
-	static final int PORT = Integer.parseInt(System.getProperty("port", SSL ? "8443" : "8080"));
+	static final int PORT = Integer.parseInt(System.getProperty("port", "8081"));
 
 	public static void main(String[] args) throws Exception {
-		// Configure SSL.
-		final SslContext sslCtx;
-		if (SSL) {
-			SelfSignedCertificate ssc = new SelfSignedCertificate();
-			sslCtx = SslContext.newServerContext(ssc.certificate(),
-					ssc.privateKey());
-		} else {
-			sslCtx = null;
-		}
 
 		// Configure the server.
 		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -38,13 +26,10 @@ public final class SasukeServer {
 			b.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class)
 					.handler(new LoggingHandler(LogLevel.INFO))
-					.childHandler(new SasukeServerInitializer(sslCtx));
+					.childHandler(new SasukeServerInitializer());
 
 			Channel ch = b.bind(PORT).sync().channel();
-
-			System.err.println("Open your web browser and navigate to "
-					+ (SSL ? "https" : "http") + "://127.0.0.1:" + PORT + '/');
-
+			System.err.println("Open your web browser and navigate to " + "http://127.0.0.1:" + PORT + '/');
 			ch.closeFuture().sync();
 		} finally {
 			bossGroup.shutdownGracefully();

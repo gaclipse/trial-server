@@ -31,6 +31,7 @@ import static io.netty.handler.codec.http.HttpVersion.*;
 public class SasukeServerHandler extends SimpleChannelInboundHandler<Object> {
 
 	private HttpRequest request;
+
 	/** Buffer that stores the response content */
 	private final StringBuilder buf = new StringBuilder();
 
