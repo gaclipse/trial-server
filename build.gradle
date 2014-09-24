@@ -3,6 +3,7 @@ apply plugin: 'eclipse'
 
 sourceCompatibility = 1.7
 version = '1.0'
+
 jar {
     manifest {
         attributes 'Implementation-Title': 'Gradle Quickstart', 'Implementation-Version': version
@@ -35,6 +36,9 @@ task fatJar(type: Jar) {
     baseName = project.name + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
+    manifest {
+        attributes 'Main-Class': 'to.gak.http.SasukeServer'
+    }
 }
 
 task wrapper(type: Wrapper) {
